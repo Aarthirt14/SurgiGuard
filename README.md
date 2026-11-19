@@ -2,6 +2,25 @@
 
 An end-to-end **nonclinical pre-incision simulation system** with separate account, team, case, protocol, session, audit and evaluation workflows. It is not clinically validated.
 
+## Prototype screenshot gallery
+
+Screenshots from the running **v0.3 research prototype**, populated with synthetic patients, fictional team accounts and scripted checklist events. Simulation approval shown here is a demonstration fixture, not clinical approval. Click any image to view it at full size.
+
+| Workspace overview | Pre-incision verification |
+| --- | --- |
+| [![Workspace overview with session counts and readiness steps](docs/screenshots/01-overview.jpg)](docs/screenshots/01-overview.jpg) | [![Verification with confirmed items, pending evidence and an overlapping-speech warning](docs/screenshots/02-verification.jpg)](docs/screenshots/02-verification.jpg) |
+| Session summaries and workspace readiness. | Role-aware checklist state and interruption handling. |
+
+| Evidence and audit | Synthetic case library |
+| --- | --- |
+| [![Timestamped evidence audit and clinician confirmation record](docs/screenshots/03-audit.jpg)](docs/screenshots/03-audit.jpg) | [![Synthetic patient cases for repeatable simulations](docs/screenshots/04-cases.jpg)](docs/screenshots/04-cases.jpg) |
+| Timestamped events, account attribution and confirmation records. | Fictional cases for controlled simulation scenarios. |
+
+| Team directory | Protocol library |
+| --- | --- |
+| [![Named team accounts with designated roles and responsibilities](docs/screenshots/05-team.jpg)](docs/screenshots/05-team.jpg) | [![Versioned protocols showing simulation-reviewed and draft states](docs/screenshots/06-protocols.jpg)](docs/screenshots/06-protocols.jpg) |
+| Coordinator, surgeon, anaesthetist and nurse responsibilities. | Versioned sources, review status and draft revisions. |
+
 ## Run locally
 
 Python 3.10+. No pip/npm dependencies or paid AI API keys are required for the core.
