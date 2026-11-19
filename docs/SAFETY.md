@@ -1,33 +1,38 @@
-# Nonclinical safety case and validation plan
+# Nonclinical safety case and validation roadmap
 
 ## Intended use
-Synthetic, scripted pre-incision checklist demonstrations and controlled research sessions. Not clinical decision support, not an approved checklist, not a medical device release. No diagnosis, treatment decision or autonomous completion. Users retain authority; an item’s designated demo role explicitly confirms it.
+Synthetic scripted pre-incision simulations and controlled research. This is not clinically validated decision support, an approved surgical checklist, or a medical device release. No diagnosis, treatment advice or autonomous completion. The six-item fixture is intentionally simplified.
 
-## Safety claims and evidence
+## Controls and limits
 
-| Claim | Control | Verification / remaining limitation |
+| Claim | Control | Limit |
 |---|---|---|
-| Speech alone cannot complete an item | Evidence only enters pending; a separate authenticated session action is required | Server tests reject completion without evidence; role identity is a demo assignment |
-| Uncertain recognition is not accepted | Missing confidence or score below 0.85 leaves a flag | Threshold is a prototype constant, not clinically calibrated |
-| Role mismatch cannot confirm | Both evidence role and acting token role checked | No automatic speaker identification; intentional role switching exists for demonstration |
-| Contradictions stay unresolved | Negative and unexpected response patterns are rejected | Bounded rules do not understand all negations or clinical language; false acceptance remains possible outside the script |
-| Interruptions preserve context | Server stores state and explicit interruption events; UI pins speech to item/role | Browser speechstart is not reliable overlap detection; an operator can explicitly flag overlap |
-| Prior actions are reviewable | Timestamped server audit chain, correction snapshots, exported records | DB administrator can reconstruct hashes; external signing and immutable storage not implemented |
-| Concurrent writes do not silently overwrite | Version checked in a serialized transaction | Stale requests require refresh/retry |
+| Speech cannot complete an item | Server accepts evidence into pending only; explicit confirmation is separate | No claim of clinical language comprehension |
+| Unknown/low confidence fails closed | Unknown or <0.85 confidence produces unresolved flag | Prototype threshold, not clinically calibrated |
+| Required-role authority | Fixed account roles, named assignments, server checks on evidence and confirmation | Accounts are not professional credential verification or voice biometrics |
+| Unrelated users cannot access sessions | Membership checked on all read/action paths | Coordinators can review workspace studies |
+| Contradictions remain unresolved | Negative/unexpected response rules reject bounded evidence | Rules cannot understand every negation or clinical utterance |
+| Context survives interruption | Persistent item state, explicit interruption events and recovery count | No robust acoustic overlap detector or echo cancellation |
+| Prior decisions are reviewable | Hash-linked timestamps, authenticated account attribution, corrections and export | DB administrators can rewrite records and recompute hashes |
+| Stale writes do not overwrite | Version check and serialized transaction | Stale request must refresh/retry |
+| Closure is gated | All items must be explicitly confirmed; only coordinator closes | Closure refers only to a simulation, not clinical clearance |
+| Protocol context is stable | Draft approval gate and frozen case/protocol/team snapshot | Local research approval is not clinical approval; bounded definitions are edited in code |
 
-## Privacy and threats
-Only synthetic data. Browser speech may use external services; explicit consent precedes capture. No raw audio stored by this app. Final transcripts persist in SQLite with no automatic retention period or encryption at rest. Limit OS access and use a disposable demo database when appropriate. Never commit DB files, exports containing sensitive data, workspace keys or tokens.
+## Privacy and access
+Use synthetic data only. Browser speech may transmit audio to its provider after explicit consent. App stores final transcripts and metadata, not raw audio. SQLite has no at-rest encryption or automatic retention cleanup. Limit operating-system access, protect backups and exclude DBs, keys and sensitive exports from Git.
 
-Session tokens are unguessable, stored as hashes server-side, and expire after 24 hours. Export excludes tokens. Network-bound startup requires a workspace key. This is not a clinician login system. Role switching is deliberate for demonstration. Origin checks, JSON-only mutations, request size limits, HTML escaping and restricted static routes reduce common web risks. The standard-library server lacks production rate limiting, federated identity, hardened deployment and recovery UI. Do not expose it as a production medical service.
+Password hashing uses salted PBKDF2-HMAC-SHA256. Eight-hour login tokens are hashed in storage, held in browser session storage and revoked on logout. Login throttling is in memory, not distributed. Only coordinator accounts create staff, approve research protocols and set up sessions. Only coordinators can inject controlled synthetic evidence on behalf of other roles. Live/typed evidence is attributed to the authenticated clinician.
 
-## Evaluation protocol
-Use synthetic cases and a frozen approved-for-study script. Randomize/counterbalance assisted versus static order. Record participant role, case, session export, independent reference completion state, omissions, false prompts, observed overlap and recovery. Separate ASR errors from item mapping errors. Use the same script and task endpoint for both modes. Measure completion accuracy, omission recall, false prompts per opportunity, speech-end-to-prompt latency, recovery success, task time and a standardized workload questionnaire; the included single 0–10 rating is only a convenience measure, not NASA-TLX.
+No SSO, MFA, password reset, staff deactivation UI, production rate limiting or external audit signing. Standard-library HTTP server is for localhost/isolated research use. Network binding requires a workspace setup key; remote use requires TLS and restricted network access. Treat browser/XSS and database-administrator compromise as unresolved production threats. HTML output is escaped, API mutations require JSON and same-origin browser requests, and static file serving is allowlisted.
 
-The automated evaluation is only a deterministic smoke benchmark over 36 labeled rule fixtures. It does not simulate actual acoustic noise. For acoustic evaluation, record or synthesize consented synthetic utterances, mix licensed room noise at defined SNRs, include scripted overlapping tracks, and independently label speaker turns. No such acoustic dataset or validated speech benchmark is bundled here.
+## Evaluation
+Counterbalance assisted/static order and keep case, protocol and task endpoint consistent. Record participant roles and independent reference labels. Distinguish ASR errors from semantic-mapping errors. Measure completion accuracy, omission recall, false prompts, speech-end-to-prompt latency, interruption recovery, task time and a standardized workload instrument. The bundled 0–10 rating is not NASA-TLX.
 
-## Roadmap
-1. Clinician review of complete institution-specific protocol, required roles and confirmation policy; sign versioned approvals.
-2. Streaming ASR/diarization adapter with calibrated scores, echo cancellation, true barge-in, explicit silence/overlap detection and fail-closed timeouts.
-3. Authenticated staff identities, least-privilege roles, access logs, encryption, retention controls, signed audit events and recovery workflow.
-4. Independent safety engineering, threat modeling and usability review, including automation bias and workload.
-5. Controlled nonclinical evaluation, then ethics/governance-approved clinical validation. No real operating-room deployment before these gates.
+The 36 automated fixtures measure rule transitions only, not actual noise robustness or speaker separation. For acoustic studies use consented synthetic utterances, licensed room noise mixed at defined SNRs, controlled overlapping tracks and independent turn labels. No validated acoustic dataset is bundled.
+
+## Before any clinical use
+1. Institution-specific full protocol, roles and approved version governance.
+2. Validated streaming ASR, calibrated confidence, diarization, echo cancellation, silence/overlap detection and timeouts.
+3. Staff identity integration, least privilege, recovery, encryption, retention and externally secured audit storage.
+4. Independent safety engineering, threat modeling and human-factors testing including automation bias.
+5. Controlled nonclinical trials followed by ethics/governance-approved clinical validation.

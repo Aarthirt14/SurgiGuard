@@ -22,15 +22,16 @@ class Store:
         CREATE TABLE IF NOT EXISTS events(seq INTEGER PRIMARY KEY AUTOINCREMENT, session TEXT NOT NULL, body TEXT NOT NULL, previous TEXT NOT NULL, hash TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS tokens(hash TEXT PRIMARY KEY, session TEXT NOT NULL, role TEXT NOT NULL, expires REAL NOT NULL);''')
         self.lock = threading.RLock()
-    def create(self, role, mode):
+    def create(self, role, mode, definitions=None):
+        definitions = definitions or ITEMS
         require(role in ROLES, 'Invalid role'); require(mode in ('assisted','static'), 'Invalid mode')
         sid = secrets.token_urlsafe(18)
-        state = dict(id=sid,version=0,mode=mode,protocol=VERSION,running=False,elapsed=0,active_since=None,created=stamp(),items=[dict(status='waiting',evidence=None) for _ in ITEMS],messages=[],responses=0,flags=0,recoveries=0,workload=None)
+        state = dict(id=sid,version=0,mode=mode,protocol=VERSION,definitions=definitions,running=False,elapsed=0,active_since=None,created=stamp(),items=[dict(status='waiting',evidence=None) for _ in definitions],messages=[],responses=0,flags=0,recoveries=0,workload=None)
         with self.lock, self.db:
             self.db.execute('INSERT INTO sessions VALUES (?,?)', (sid,json.dumps(state)))
             self.event(sid,'SESSION_CREATED',None,dict(mode=mode,role=role))
             token = self.token(sid,role)
-        return dict(token=token,state=self.read(sid),role=role,protocol=ITEMS)
+        return dict(token=token,state=self.read(sid),role=role,protocol=definitions)
     def token(self,sid,role):
         token=secrets.token_urlsafe(32)
         self.db.execute('INSERT INTO tokens VALUES (?,?,?,?)',(hashlib.sha256(token.encode()).hexdigest(),sid,role,time.time()+86400))
@@ -43,7 +44,9 @@ class Store:
     def event(self,sid,kind,index,detail):
         prev=self.db.execute('SELECT hash FROM events WHERE session=? ORDER BY seq DESC LIMIT 1',(sid,)).fetchone()
         previous=prev[0] if prev else '0'*64
-        body=json.dumps(dict(timestamp=stamp(),type=kind,item=ITEMS[index]['title'] if index is not None else 'Session',detail=detail),sort_keys=True,separators=(',',':'))
+        stored=self.db.execute('SELECT state FROM sessions WHERE id=?',(sid,)).fetchone()
+        definitions=json.loads(stored[0]).get('definitions',ITEMS) if stored else ITEMS
+        body=json.dumps(dict(timestamp=stamp(),type=kind,item=definitions[index]['title'] if index is not None else 'Session',detail=detail),sort_keys=True,separators=(',',':'))
         digest=hashlib.sha256((previous+body).encode()).hexdigest()
         self.db.execute('INSERT INTO events(session,body,previous,hash) VALUES (?,?,?,?)',(sid,body,previous,digest))
     def read(self,sid):
@@ -59,10 +62,13 @@ class Store:
             s=json.loads(self.db.execute('SELECT state FROM sessions WHERE id=?',(sid,)).fetchone()[0])
             require(data.get('version')==s['version'],'Session changed. Refresh and retry the action.',409)
             action=data.get('action'); i=data.get('item'); detail={'actor':actor}
+            if data.get('_identity'): detail['account']=data['_identity']
+            definitions=s.get('definitions',ITEMS)
+            require(not s.get('closed'), 'Session is closed',409)
             if action in ('evidence','confirm','correct','override','interrupt'):
-                require(type(i) is int and 0<=i<len(ITEMS),'Invalid checklist item')
+                require(type(i) is int and 0<=i<len(definitions),'Invalid checklist item')
                 require(s['running'],'Start the session first')
-                x=s['items'][i];d=ITEMS[i]
+                x=s['items'][i];d=definitions[i]
             if action=='toggle':
                 if s['running']: s['elapsed']+=time.time()-s['active_since'];s['active_since']=None
                 else: s['active_since']=time.time()
@@ -96,6 +102,10 @@ class Store:
                 require(actor==d['role'],'Only the designated role can correct or override',403)
                 reason=data.get('reason','');require(isinstance(reason,str) and 3<=len(reason.strip())<=1000,'A reason of 3–1000 characters is required')
                 detail.update(reason=reason,previous=dict(x));x.clear();x.update(status='flag' if action=='override' else 'waiting',evidence=None,reason='Override recorded; unresolved.' if action=='override' else 'Reopened for corrected evidence.')
+            elif action=='finish':
+                require(all(x['status']=='confirmed' for x in s['items']), 'Confirm all items before closing',409)
+                if s['running']: s['elapsed']+=time.time()-s['active_since']
+                s.update(running=False,active_since=None,closed=True,closed_at=stamp())
             elif action=='workload':
                 rating=data.get('rating');require(type(rating) in (int,float) and math.isfinite(rating) and 0<=rating<=10,'Workload must be 0–10');s['workload']=rating;detail['rating']=rating
             else: raise Problem('Unknown action')
@@ -146,8 +156,10 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--host',default='127.0.0.1');p.add_argument('--port',type=int,default=8000);p.add_argument('--strictPort',action='store_true',help=argparse.SUPPRESS);p.add_argument('--db',default=str(ROOT/'data'/'surgiguard.sqlite3'));args=p.parse_args()
     if args.host not in ('127.0.0.1','localhost','::1') and not os.getenv('SURGIGUARD_ACCESS_KEY'): p.error('Set SURGIGUARD_ACCESS_KEY before binding to a network interface')
     Path(args.db).parent.mkdir(parents=True,exist_ok=True)
-    server=ThreadingHTTPServer((args.host,args.port),Handler);server.store=Store(args.db)
+    from system import SystemHandler, SystemStore
+    server=ThreadingHTTPServer((args.host,args.port),SystemHandler);server.store=SystemStore(args.db)
     print(f'SurgiGuard nonclinical simulator: http://{args.host}:{args.port}',flush=True)
     try: server.serve_forever()
     except KeyboardInterrupt: server.server_close()
 if __name__=='__main__': main()
+
