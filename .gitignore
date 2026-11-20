@@ -6,3 +6,8 @@ data/
 *.sqlite3*
 *.json.export
 .openai/
+
+models/
+*.wav
+*.pcm
+audio-report*.json

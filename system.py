@@ -147,13 +147,14 @@ class SystemHandler(Handler):
         try:
             p=urlparse(self.path);path=p.path;store=self.server.store
             if path=='/api/status':return self.reply(200,dict(initialized=bool(store.users()),nonclinical=True,version='0.3.0'))
+            if path=='/api/audio/capabilities':return self.reply(200,dict(available=False,engine='browser-fallback'))
             if path=='/api/health':return self.reply(200,dict(ok=True,version='0.3.0',nonclinical=True))
             if path.startswith('/api/'):
                 u=store.user(self.bearer())
                 if path=='/api/workspace':return self.reply(200,store.workspace(u))
                 if path=='/api/session':return self.reply(200,store.session(u,parse_qs(p.query).get('id',[''])[0]))
                 raise Problem('Not found',404)
-            assets={'/':('index.html','text/html; charset=utf-8'),'/style.css':('style.css','text/css'),'/app.js':('app.js','text/javascript')};require(path in assets,'Not found',404);name,mime=assets[path];self.reply(200,(ROOT/'web'/name).read_bytes(),mime)
+            assets={'/':('index.html','text/html; charset=utf-8'),'/style.css':('style.css','text/css'),'/app.js':('app.js','text/javascript'),'/local-audio.js':('local-audio.js','text/javascript'),'/pcm-worklet.js':('pcm-worklet.js','text/javascript')};require(path in assets,'Not found',404);name,mime=assets[path];self.reply(200,(ROOT/'web'/name).read_bytes(),mime)
         except Problem as e:self.reply(e.status,dict(error=e.message))
         except Exception:self.reply(500,dict(error='Server error; check local server configuration'))
     def do_POST(self):

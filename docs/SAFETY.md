@@ -12,7 +12,7 @@ Synthetic scripted pre-incision simulations and controlled research. This is not
 | Required-role authority | Fixed account roles, named assignments, server checks on evidence and confirmation | Accounts are not professional credential verification or voice biometrics |
 | Unrelated users cannot access sessions | Membership checked on all read/action paths | Coordinators can review workspace studies |
 | Contradictions remain unresolved | Negative/unexpected response rules reject bounded evidence | Rules cannot understand every negation or clinical utterance |
-| Context survives interruption | Persistent item state, explicit interruption events and recovery count | No robust acoustic overlap detector or echo cancellation |
+| Context survives interruption | Persistent item state, explicit interruption events and recovery count | Optional browser echo cancellation and playback guards are unvalidated; no robust acoustic overlap detector |
 | Prior decisions are reviewable | Hash-linked timestamps, authenticated account attribution, corrections and export | DB administrators can rewrite records and recompute hashes |
 | Stale writes do not overwrite | Version check and serialized transaction | Stale request must refresh/retry |
 | Closure is gated | All items must be explicitly confirmed; only coordinator closes | Closure refers only to a simulation, not clinical clearance |
@@ -36,3 +36,7 @@ The 36 automated fixtures measure rule transitions only, not actual noise robust
 3. Staff identity integration, least privilege, recovery, encryption, retention and externally secured audit storage.
 4. Independent safety engineering, threat modeling and human-factors testing including automation bias.
 5. Controlled nonclinical trials followed by ethics/governance-approved clinical validation.
+
+## Local audio extension
+
+See [AUDIO.md](AUDIO.md) for setup, enrollment and privacy behavior and [VALIDATION.md](VALIDATION.md) for the evidence plan. Three-sample speaker matching is an experimental input filter, not authentication. Other-speaker clusters are never granted roles. Unknown, short or ambiguous embeddings abstain. A mixed utterance can still match the enrolled speaker, so this is not reliable overlap rejection. Capture remains active during playback but recognition is discarded until a post-playback guard expires. Local audio abstentions and final evidence are audited; PCM and embeddings are not persisted.

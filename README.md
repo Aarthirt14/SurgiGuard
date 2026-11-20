@@ -65,15 +65,25 @@ See [docs/DEMO.md](docs/DEMO.md) for a demonstration sequence.
 | Evaluation | Paired trial identifiers, observed metrics and CSV export |
 | Governance | Account creation, sign-ins and protocol review history |
 
+## Local streaming audio extension
+
+An optional local Vosk pipeline now adds continuous PCM capture, streaming transcripts, three-utterance voice enrollment, conservative speaker matching, playback echo guards, barge-in and authenticated WebSocket transport. See [audio setup and demonstration](docs/AUDIO.md) and the [validation plan](docs/VALIDATION.md). This is experimental: simultaneous-speaker source separation and clinical reliability are not established.
+
+```bash
+python -m pip install -r requirements-audio.txt
+# Download and extract the two official models described in docs/AUDIO.md first.
+python audio_server.py --model models/vosk-model-small-en-us-0.15 --speaker-model models/vosk-model-spk-0.4
+```
+
 ## Implemented and outstanding
 
 **Implemented:** local account authentication and server authorization, SQLite persistence, case-specific identity matching, frozen protocol/team/case snapshots, browser microphone transcription where supported, spoken prompts, conservative deterministic evidence rules, explicit confirmation, interruption context, correction/override history, synthetic scenarios, static comparator and structured exports.
 
-**Outstanding:** reliable full-duplex echo cancellation, automatic diarization/voice identity, acoustic noise and overlap detection, clinically approved protocols, general clinical language understanding, clinical validation and hardened production deployment. No LLM is used. “Simulation approved” means a coordinator's local research attestation, never clinical certification.
+**Outstanding:** validated full-duplex performance, reliable simultaneous-speaker separation, calibrated speaker identity, robust acoustic noise and overlap detection, clinically approved protocols, general clinical language understanding, clinical validation and hardened production deployment. No LLM is used. “Simulation approved” means a coordinator's local research attestation, never clinical certification.
 
 Protocol revisions currently copy the fixed bounded item definitions and change review metadata. Change `protocol.py` and extend tests for new checklist semantics; this prototype does not yet have a free-form clinical protocol editor. The six-item fixture is simplified and not a complete WHO/institutional checklist.
 
-Browser speech supports streaming interim/final text when available, but compatibility and confidence reporting vary. Missing or <0.85 confidence stays unresolved. Browser speech-start cancels assistant output for basic barge-in; headphones reduce echo. This is not validated full-duplex or simultaneous-speaker processing. Switching item/route stops recognition to preserve attribution. Live/typed evidence is assigned to the authenticated account, not voice biometrics. Scenario noise/overlap and confidence values are fixtures. Typed confidence 1.0 is a manual-input marker, not measured ASR quality.
+Browser speech supports streaming interim/final text when available, but compatibility and confidence reporting vary. Missing or <0.85 confidence stays unresolved. Browser speech-start cancels assistant output for basic barge-in; headphones reduce echo. The optional local mode adds acoustic speaker matching and guarded duplex capture; neither mode is validated full-duplex or simultaneous-speaker processing. Switching item/route stops recognition to preserve attribution. Live/typed evidence is assigned to the authenticated account. Local voice matching filters evidence but never grants account authority. Scenario noise/overlap and confidence values are fixtures. Typed confidence 1.0 is a manual-input marker, not measured ASR quality.
 
 ## Tests
 
@@ -90,6 +100,8 @@ The evaluation runner uses 36 deterministic fixtures. Its rule accuracy/latency 
 
 ## Architecture
 
+- `audio_server.py`, `audio/`: optional local ASR gateway, speaker enrollment and audio gates.
+- `scripts/evaluate_audio.py`: labeled WAV replay with actual speech models.
 - `system.py`: account, case, protocol, team-assignment, governance and study APIs.
 - `server.py`: transactional checklist engine, SQLite audit storage and local HTTP startup. The earlier legacy handler remains only for engine tests; it is not mounted by the application.
 - `protocol.py`: synthetic definitions and bounded matching rules.
@@ -117,7 +129,7 @@ docker run --rm -p 127.0.0.1:8000:8000 -e SURGIGUARD_ACCESS_KEY -v surgiguard-da
 
 No SSO/MFA, password-reset service, account-disable UI, scheduled retention deletion, encryption at rest or independent audit signing is provided. Failed-login throttling is in memory and resets on server restart. Administrators can rewrite database records and hash chains. Pause before server shutdown; downtime counts toward an unpaused session's active time.
 
-Browser recognition may send audio to the browser vendor after explicit opt-in. SurgiGuard stores final transcripts, confidence and events, not raw audio. Never commit keys, database files or sensitive exports. See [docs/SAFETY.md](docs/SAFETY.md).
+Browser recognition may send audio to the browser vendor after explicit opt-in. Optional local Vosk mode sends PCM to your own server and discards it after processing; voice embeddings live only for the connection. SurgiGuard stores final accepted/rejected transcripts, confidence and audit events, not raw audio. Never commit keys, database files or sensitive exports. See [docs/SAFETY.md](docs/SAFETY.md).
 
 Browser API references:
 - https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API
