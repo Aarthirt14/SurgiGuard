@@ -4,10 +4,13 @@ import time
 from .gates import Speakers, pcm_quality, word_confidence
 
 class Stream:
-    def __init__(self, recognizer, emit, enroll=True, clock=time.monotonic):
+    def __init__(self, recognizer, emit, enroll=True, clock=time.monotonic, duplex=False):
         self.rec, self.emit, self.clock = recognizer, emit, clock
         self.speakers = Speakers()
         self.enrolling = enroll
+        self.duplex = duplex
+        self.echo_seen = False
+        self.overlap_seen = False
         self.sequence = 0
         self.playing = False
         self.cooldown = 0
@@ -18,6 +21,7 @@ class Stream:
 
     def reset(self):
         self.rec.Reset()
+        self.echo_seen = self.overlap_seen = False
         self.samples = self.clipped = 0
         self.last_partial = ''
         self.started = self.clock()
@@ -25,7 +29,7 @@ class Stream:
     def playback(self, active):
         self.playing = active
         self.cooldown = self.clock()+.6
-        self.reset()
+        if not self.duplex:self.reset()
 
     def feed(self, packet):
         if not 6 <= len(packet) <= 6404 or (len(packet)-4) % 2:
@@ -37,7 +41,8 @@ class Stream:
         raw = packet[4:]
         quality = pcm_quality(raw)
         if self.playing or self.clock() < self.cooldown:
-            return {'type': 'listening', 'reason': 'Playback echo guard'}
+            if self.duplex:self.echo_seen=True
+            else:return {'type': 'listening', 'reason': 'Playback echo guard'}
         count = len(raw)//2
         self.samples += count
         self.clipped += quality['clipped']*count
@@ -58,6 +63,10 @@ class Stream:
         self.last_partial = ''
         if not text:
             return None
+        echo,overlap=self.echo_seen,self.overlap_seen
+        self.echo_seen=self.overlap_seen=False
+        if echo or overlap:
+            return {'type':'rejected','text':text,'reason':'Simultaneous channels or assistant playback contaminated this turn; repeat one speaker at a time','overlap':overlap,'echo':echo}
         confidence = word_confidence(result)
         if clipping > .02 or confidence is None or confidence < .85:
             return {'type': 'rejected', 'text': text, 'reason': 'Clipping or uncertain transcription; repeat', 'confidence': confidence}

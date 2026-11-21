@@ -52,6 +52,10 @@ class AudioHTTPTests(unittest.IsolatedAsyncioTestCase):
   third,event=await self.connect();self.assertEqual(event['type'],'error');await third.close()
   with self.store.db:self.store.db.execute('DELETE FROM logins')
   await first.send_bytes(packet(0));self.assertEqual((await first.receive_json())['type'],'error');await first.close()
+ async def test_other_item_changes_do_not_disconnect_channel(self):
+  ws,event=await self.connect();self.assertEqual(event['type'],'ready')
+  self.store.action(self.user,dict(session=self.session,action='evidence',version=self.store.read(self.session)['version'],item=1,kind='clean',role='Surgeon',text='Patient Alex Morgan elective procedure left confirmed',confidence=.97))
+  await ws.send_bytes(packet(0));self.assertEqual((await ws.receive_json())['type'],'enrollment');await ws.close()
  async def test_external_state_change_aborts_and_origin_rejected(self):
   ws,event=await self.connect()
   self.store.action(self.user,dict(session=self.session,action='toggle',version=self.store.read(self.session)['version']))

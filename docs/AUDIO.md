@@ -86,3 +86,9 @@ The report includes WER, target acceptance, false acceptance (other-speaker or o
 ## Verification recorded during implementation
 
 The actual speech and speaker models loaded and processed the upstream Vosk `python/example/test.wav` fixture: three nonempty final transcripts and three speaker vectors were returned. This is only a model-loading/inference smoke test. It is not a held-out speaker test, checklist benchmark, noise test or clinical validation. The transport tests use an injected recognizer so authorization and failure paths can be exercised deterministically. Run the optional JavaScript capture/transport tests with `node tests/test_audio_client.cjs`.
+
+## Duplex and multi-channel extension
+
+The default remains guarded playback. The new **Experimental duplex recognition** checkbox keeps ASR running during playback; echo-contaminated turns are rejected rather than silently accepted. This option is unvalidated and requires a headset. Separate assigned accounts can keep different checklist-item channels open concurrently. An energy-based overlap monitor taints simultaneous channels so their turns are repeated. It cannot separate a mixed single-microphone waveform and is sensitive to cross-talk and network jitter. Changes to the selected item still stop stale capture; unrelated item changes no longer disconnect the channel. Enrollment completion arms a 30-second response deadline.
+
+See [REQUIREMENTS.md](REQUIREMENTS.md) for real corpus results, reproducible noise generation and remaining tests. The newly published generated corpus failed voice enrollment; the earlier upstream model-loading smoke test did not establish speech or speaker accuracy.

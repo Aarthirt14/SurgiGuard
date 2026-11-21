@@ -65,7 +65,7 @@ class Store:
             if data.get('_identity'): detail['account']=data['_identity']
             definitions=s.get('definitions',ITEMS)
             require(not s.get('closed'), 'Session is closed',409)
-            if action in ('evidence','confirm','correct','override','interrupt'):
+            if action in ('evidence','confirm','correct','override','interrupt','prompt'):
                 require(type(i) is int and 0<=i<len(definitions),'Invalid checklist item')
                 require(s['running'],'Start the session first')
                 x=s['items'][i];d=definitions[i]
@@ -73,6 +73,17 @@ class Store:
                 if s['running']: s['elapsed']+=time.time()-s['active_since'];s['active_since']=None
                 else: s['active_since']=time.time()
                 s['running']=not s['running'];detail['running']=s['running']
+            elif action=='prompt':
+                require(s['mode']=='assisted','Prompts disabled in static comparator')
+                require(x['status'] not in ('pending','confirmed'),'Resolve or confirm current evidence first')
+                timeout=data.get('timeout',30)
+                require(type(timeout) is int and 5<=timeout<=120,'Response timeout must be 5–120 seconds')
+                require(actor in ('Coordinator',d['role']),'Only facilitator or designated role may prompt',403)
+                from omissions import active_time
+                x['response_deadline']=active_time(s,time.time())+timeout
+                message=f'{d["role"]}, please verify {d["title"]}.'
+                detail.update(timeout=timeout,source=d['source'],prompt=message)
+                s['messages'].append(dict(role='SurgiGuard',text=message,time=stamp()))
             elif action=='role':
                 role=data.get('role');require(role in ROLES,'Invalid role')
                 # Role switching is deliberately exposed in this nonclinical demo, not identity proof.
@@ -89,6 +100,7 @@ class Store:
                 status,reason=assess(d,text,role,confidence,kind)
                 if x.get('kind') in ('overlap','interruption') and status=='pending': s['recoveries']+=1
                 x.update(status=status,reason=reason,kind=kind,evidence=dict(text=text,role=role,confidence=confidence,source=kind))
+                if status=='pending':x.pop('response_deadline',None)
                 s['responses']+=1;s['flags']+=int(status=='flag')
                 s['messages'] += [dict(role=role,text=text,confidence=confidence,source=kind,time=stamp()),dict(role='SurgiGuard',text=reason,warning=status=='flag',time=stamp())]
                 detail.update(x)
@@ -96,6 +108,7 @@ class Store:
                 require(actor==d['role'],'Only the designated role can confirm',403)
                 require(x['status']!='confirmed','Item already confirmed')
                 require(s['mode']=='static' or x['status']=='pending','Evidence is unresolved; cannot confirm',409)
+                x.pop('response_deadline',None)
                 x.update(status='confirmed',confirmedBy=actor,confirmedAt=stamp());detail['evidence']=x['evidence']
                 s['messages'].append(dict(role='SurgiGuard',text=f'{d["title"]} explicitly confirmed by {actor}.',time=stamp()))
             elif action in ('correct','override'):
@@ -110,7 +123,7 @@ class Store:
                 rating=data.get('rating');require(type(rating) in (int,float) and math.isfinite(rating) and 0<=rating<=10,'Workload must be 0–10');s['workload']=rating;detail['rating']=rating
             else: raise Problem('Unknown action')
             s['version']+=1
-            self.event(sid,action.upper(),i if action in ('evidence','confirm','correct','override','interrupt') else None,detail)
+            self.event(sid,action.upper(),i if action in ('evidence','confirm','correct','override','interrupt','prompt') else None,detail)
             self.db.execute('UPDATE sessions SET state=? WHERE id=?',(json.dumps(s),sid))
         result=dict(state=self.read(sid),role=detail.get('new_role',actor))
         if action=='role': result['token']=new_token
@@ -158,8 +171,12 @@ def main():
     Path(args.db).parent.mkdir(parents=True,exist_ok=True)
     from system import SystemHandler, SystemStore
     server=ThreadingHTTPServer((args.host,args.port),SystemHandler);server.store=SystemStore(args.db)
+    from omissions import start_monitor
+    monitor,monitor_thread=start_monitor(server.store)
     print(f'SurgiGuard nonclinical simulator: http://{args.host}:{args.port}',flush=True)
     try: server.serve_forever()
-    except KeyboardInterrupt: server.server_close()
+    except KeyboardInterrupt: pass
+    finally:
+        monitor.set();monitor_thread.join(timeout=2);server.server_close();server.store.db.close()
 if __name__=='__main__': main()
 

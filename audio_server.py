@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 from server import ThreadingHTTPServer, Problem, require, ROOT
 from system import SystemHandler, SystemStore
 from audio.stream import Stream
+from audio.channels import Channels
 
 
 def create_app(store, recognizer_factory, backend_url):
@@ -17,6 +18,7 @@ def create_app(store, recognizer_factory, backend_url):
     app = web.Application(client_max_size=16000)
     client_key = web.AppKey('upstream_client', ClientSession)
     active = set()
+    channels = Channels()
 
     async def audio(request):
         origin = urlparse(request.headers.get('Origin', ''))
@@ -42,21 +44,34 @@ def create_app(store, recognizer_factory, backend_url):
             active.add(key)
             registered = True
             version = current['version']
+            signature = json.dumps(current['items'][item],sort_keys=True)
+            def remember(result):
+                nonlocal version,signature
+                version=result['state']['version']
+                signature=json.dumps(result['state']['items'][item],sort_keys=True)
+            def sync():
+                nonlocal version
+                state=store.session(u,sid)['state']
+                require(state['running'] and not state['closed'] and json.dumps(state['items'][item],sort_keys=True)==signature,
+                        'Selected item changed or session paused. Reconnect to preserve attribution',409)
+                version=state['version']
             def emit(text, confidence, speaker):
                 nonlocal version
                 # Re-authenticate every accepted utterance. Never use client-supplied role or score.
                 user = store.user(token)
                 with store.lock:
+                    sync()
                     result = store.action(user, dict(session=sid, action='evidence', version=version,
                         item=item, text=text, confidence=confidence, kind='speech'))
-                    version = result['state']['version']
+                    remember(result)
                     with store.db:
                         store.event(sid, 'LOCAL_AUDIO_EVIDENCE', item,
                             dict(user=user['id'],speaker=speaker,engine='vosk',role_source='authenticated-account',
                                  confirmation='required',confidence_rule='minimum word confidence'))
                 return dict(version=version,status=result['state']['items'][item]['status'])
             rec = await asyncio.to_thread(recognizer_factory)
-            stream = Stream(rec, emit)
+            stream = Stream(rec, emit, duplex=hello.get('duplex') is True)
+            channels.add(key,stream)
             await ws.send_json(dict(type='ready', enrollment=3, sampleRate=16000,
                 message='Read three distinct synthetic sentences, pausing after each. Enrollment never completes an item.'))
             start = time.monotonic(); byte_count = 0; messages = 0
@@ -64,9 +79,7 @@ def create_app(store, recognizer_factory, backend_url):
                 msg = await asyncio.wait_for(ws.receive(), max(.01,min(30,1800-(time.monotonic()-start))))
                 # Revocation, pause and conflicting edits stop capture before any new inference.
                 store.user(token)
-                state = store.session(u, sid)['state']
-                require(state['running'] and not state['closed'] and state['version']==version,
-                        'Session changed or paused. Reconnect to preserve item attribution',409)
+                sync()
                 elapsed = time.monotonic()-start
                 require(elapsed < 1800, 'Audio session limit reached')
                 messages += 1
@@ -74,14 +87,22 @@ def create_app(store, recognizer_factory, backend_url):
                 if msg.type == WSMsgType.BINARY:
                     byte_count += len(msg.data)
                     require(byte_count <= 40000*(elapsed+2), 'Audio upload exceeds real-time rate')
+                    require(6<=len(msg.data)<=6404 and (len(msg.data)-4)%2==0,'Invalid PCM frame')
+                    channels.feed(key,msg.data[4:])
                     result = await asyncio.to_thread(stream.feed, msg.data)
                     if result:
+                        if result['type']=='enrollment' and result.get('ready'):
+                            with store.lock:
+                                sync()
+                                if store.read(sid)['items'][item]['status'] not in ('pending','confirmed'):
+                                    prompted=store.action(u,dict(session=sid,action='prompt',version=version,item=item,timeout=30))
+                                    remember(prompted)
                         if result['type']=='rejected':
                             # New uncertain evidence must invalidate any prior pending candidate.
                             if not stream.enrolling:
                                 rejected = store.action(u,dict(session=sid,action='evidence',version=version,
                                     item=item,text=result.get('text','[Unresolved audio]'),confidence=None,kind='speech'))
-                                version = rejected['state']['version']
+                                remember(rejected)
                             with store.lock,store.db:
                                 store.event(sid,'AUDIO_ABSTENTION',item,dict(user=u['id'],**result))
                         await ws.send_json(result)
@@ -94,7 +115,7 @@ def create_app(store, recognizer_factory, backend_url):
                         stream.playback(False)
                         result = store.action(u,dict(session=sid,action='interrupt',version=version,
                             item=item,kind='interruption',text='[Local audio barge-in; repeat after prompt stops]',confidence=None))
-                        version=result['state']['version']
+                        remember(result)
                         await ws.send_json(dict(type='interrupted',message='Context retained. Please repeat your complete response.'))
                     else:
                         raise ValueError('Unknown audio command')
@@ -109,12 +130,13 @@ def create_app(store, recognizer_factory, backend_url):
         finally:
             if registered:
                 active.discard(key)
+                channels.remove(key)
             await ws.close()
         return ws
 
     async def capabilities(request):
         return web.json_response(dict(available=True,engine='vosk-local',speakerEnrollment=True,
-            simultaneousSeparation=False,clinicalValidation=False))
+            simultaneousSeparation=False,isolatedChannelOverlap=True,continuousRecognition=True,clinicalValidation=False))
 
     async def proxy(request):
         # Fixed loopback upstream, no arbitrary URL forwarding. Preserve original Origin/Host.
@@ -126,9 +148,12 @@ def create_app(store, recognizer_factory, backend_url):
                          ('transfer-encoding','connection','content-length','content-encoding')})
     async def lifecycle(app):
         from aiohttp import ClientTimeout
+        from omissions import start_monitor
+        stop,thread=start_monitor(store)
         async with ClientSession(timeout=ClientTimeout(total=30)) as client:
             app[client_key]=client
-            yield
+            try:yield
+            finally:stop.set();thread.join(timeout=2)
     app.cleanup_ctx.append(lifecycle)
     app.router.add_get('/api/audio/capabilities',capabilities)
     app.router.add_get('/api/audio/stream',audio)

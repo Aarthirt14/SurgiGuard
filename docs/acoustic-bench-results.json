@@ -1,0 +1,422 @@
+{
+  "nonclinical": true,
+  "engine": "vosk",
+  "clinical_validation": false,
+  "note": "Offline processing timing is not live response latency. Acceptance is an audio gate, never checklist completion.",
+  "word_error_rate": 1.0887573964497042,
+  "trials": 26,
+  "enrollment": [
+    {
+      "file": "enroll-1.wav",
+      "accepted": false,
+      "reason": "One clear, confidently transcribed utterance required"
+    },
+    {
+      "file": "enroll-2.wav",
+      "accepted": false,
+      "reason": "One clear, confidently transcribed utterance required"
+    },
+    {
+      "file": "enroll-3.wav",
+      "accepted": false,
+      "reason": "One clear, confidently transcribed utterance required"
+    }
+  ],
+  "speaker_metrics_valid": false,
+  "corpus_provenance": "FFmpeg libflite synthetic voices kal/slt; deterministic Gaussian noise seed 42; not humans or OR acoustics",
+  "false_accept_rate": null,
+  "target_accept_rate": null,
+  "results": [
+    {
+      "id": "team-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 8,
+      "processing_seconds": 1.4815991199999416,
+      "audio_seconds": 3.68575,
+      "real_time_factor": 0.40198036220577676,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "team-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 8,
+      "processing_seconds": 1.378226369999993,
+      "audio_seconds": 3.68575,
+      "real_time_factor": 0.3739337638201161,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "team-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 8,
+      "processing_seconds": 0.9176243630000727,
+      "audio_seconds": 3.68575,
+      "real_time_factor": 0.24896543797058202,
+      "speaker_labels": []
+    },
+    {
+      "id": "team-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 10,
+      "reference_words": 8,
+      "processing_seconds": 1.4524050020000914,
+      "audio_seconds": 3.68575,
+      "real_time_factor": 0.39405955422915045,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "identity-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 9,
+      "reference_words": 8,
+      "processing_seconds": 1.503479513000002,
+      "audio_seconds": 5.468125,
+      "real_time_factor": 0.2749533913361531,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "identity-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 13,
+      "reference_words": 8,
+      "processing_seconds": 2.243175215000065,
+      "audio_seconds": 5.468125,
+      "real_time_factor": 0.41022749388502733,
+      "speaker_labels": [
+        "unknown",
+        "unknown"
+      ]
+    },
+    {
+      "id": "identity-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 8,
+      "processing_seconds": 2.188858735999929,
+      "audio_seconds": 5.468125,
+      "real_time_factor": 0.4002942024917004,
+      "speaker_labels": [
+        "unknown",
+        "unknown"
+      ]
+    },
+    {
+      "id": "identity-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 14,
+      "reference_words": 8,
+      "processing_seconds": 1.9439615300000241,
+      "audio_seconds": 5.468125,
+      "real_time_factor": 0.3555078806720812,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "surgeon-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 3,
+      "reference_words": 6,
+      "processing_seconds": 1.1091388549999692,
+      "audio_seconds": 3.133125,
+      "real_time_factor": 0.3540040231398266,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "surgeon-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 6,
+      "reference_words": 6,
+      "processing_seconds": 1.4113948210000444,
+      "audio_seconds": 3.133125,
+      "real_time_factor": 0.45047510744066843,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "surgeon-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 5,
+      "reference_words": 6,
+      "processing_seconds": 1.2821971140000414,
+      "audio_seconds": 3.133125,
+      "real_time_factor": 0.4092390549371766,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "surgeon-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 1.3470251460000782,
+      "audio_seconds": 3.133125,
+      "real_time_factor": 0.4299302281268951,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "anaesthesia-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 1.2419458159999976,
+      "audio_seconds": 3.436875,
+      "real_time_factor": 0.36135902993271435,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "anaesthesia-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 3.024510212999985,
+      "audio_seconds": 3.436875,
+      "real_time_factor": 0.8800175196944855,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "anaesthesia-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 5,
+      "reference_words": 6,
+      "processing_seconds": 1.509350765000022,
+      "audio_seconds": 3.436875,
+      "real_time_factor": 0.43916370685579836,
+      "speaker_labels": [
+        "unknown",
+        "unknown"
+      ]
+    },
+    {
+      "id": "anaesthesia-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 6,
+      "processing_seconds": 1.2953327789999776,
+      "audio_seconds": 3.436875,
+      "real_time_factor": 0.376892607092192,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "sterility-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 6,
+      "reference_words": 5,
+      "processing_seconds": 1.4935392860001002,
+      "audio_seconds": 3.798,
+      "real_time_factor": 0.39324362453925754,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "sterility-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 5,
+      "processing_seconds": 1.7276241690000234,
+      "audio_seconds": 3.798,
+      "real_time_factor": 0.4548773483412384,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "sterility-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 5,
+      "reference_words": 5,
+      "processing_seconds": 1.4921042859999716,
+      "audio_seconds": 3.798,
+      "real_time_factor": 0.39286579410215156,
+      "speaker_labels": [
+        "unknown",
+        "unknown"
+      ]
+    },
+    {
+      "id": "sterility-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 5,
+      "processing_seconds": 2.535456317000012,
+      "audio_seconds": 3.798,
+      "real_time_factor": 0.6675767027382864,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "review-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 1.883099942000058,
+      "audio_seconds": 4.2185,
+      "real_time_factor": 0.44639088348940575,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "review-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 10,
+      "reference_words": 6,
+      "processing_seconds": 1.648947053000029,
+      "audio_seconds": 4.2185,
+      "real_time_factor": 0.39088468721110087,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "review-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 6,
+      "reference_words": 6,
+      "processing_seconds": 1.4111933849999332,
+      "audio_seconds": 4.2185,
+      "real_time_factor": 0.334524922365754,
+      "speaker_labels": [
+        "unknown",
+        "unknown"
+      ]
+    },
+    {
+      "id": "review-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 1.6177826539999387,
+      "audio_seconds": 4.2185,
+      "real_time_factor": 0.3834971326300673,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "wrong-speaker",
+      "condition": "different speaker",
+      "expected_speaker": false,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 2,
+      "reference_words": 13,
+      "processing_seconds": 1.0708680510000477,
+      "audio_seconds": 5.61,
+      "real_time_factor": 0.1908855705882438,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "silence",
+      "condition": "silence",
+      "expected_speaker": false,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 0,
+      "reference_words": 0,
+      "processing_seconds": 0.46170978700001797,
+      "audio_seconds": 6.0,
+      "real_time_factor": 0.07695163116666966,
+      "speaker_labels": []
+    }
+  ]
+}

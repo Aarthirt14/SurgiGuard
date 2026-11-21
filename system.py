@@ -21,6 +21,7 @@ class SystemStore(Store):
         CREATE TABLE IF NOT EXISTS studies(session TEXT PRIMARY KEY,body TEXT);
         CREATE TABLE IF NOT EXISTS reviews(session TEXT,user_id TEXT,body TEXT,PRIMARY KEY(session,user_id));
         CREATE TABLE IF NOT EXISTS governance(id INTEGER PRIMARY KEY,body TEXT);''')
+        self.db.execute('CREATE TABLE IF NOT EXISTS study_scores(id INTEGER PRIMARY KEY,session TEXT,body TEXT)')
         self.attempts={}
         with self.db:
             if not self.db.execute('SELECT 1 FROM protocols').fetchone():
@@ -79,7 +80,8 @@ class SystemStore(Store):
     def session(self,u,sid):
         with self.lock:
             self.access(u,sid);s=self.read(sid);meta=json.loads(self.db.execute('SELECT body FROM studies WHERE session=?',(sid,)).fetchone()[0]);reviews=[dict(json.loads(b),reviewer=uid) for uid,b in self.db.execute('SELECT user_id,body FROM reviews WHERE session=?',(sid,))]
-        return dict(state=s,meta=meta,protocol=s['definitions'],reviews=reviews,role=u['role'])
+        scores=[json.loads(b) for b, in self.db.execute('SELECT body FROM study_scores WHERE session=? ORDER BY id',(sid,))]
+        return dict(state=s,meta=meta,protocol=s['definitions'],reviews=reviews,role=u['role'],scores=scores)
     def create_study(self,u,data):
         self.admin(u)
         with self.lock:
@@ -104,7 +106,7 @@ class SystemStore(Store):
                 self.db.execute('UPDATE sessions SET state=? WHERE id=?',(json.dumps(s),sid));self.event(sid,'TEAM_ASSIGNED',None,dict(user=u['id'],team=members))
         return self.session(u,sid)
     def action(self,u,data):
-        sid=data.get('session');action=data.get('action');require(action in ('toggle','evidence','interrupt','confirm','correct','override','workload','finish'),'Unsupported action')
+        sid=data.get('session');action=data.get('action');require(action in ('toggle','evidence','interrupt','confirm','correct','override','workload','finish','prompt'),'Unsupported action')
         with self.lock:
             cap=self.access(u,sid);require(cap,'Observer cannot modify this session',403);data=dict(data,_identity=u)
             if action in ('toggle','finish'):self.admin(u)
@@ -117,6 +119,18 @@ class SystemStore(Store):
             super().act(cap,data)
         return self.session(u,sid)
     def mutate(self,u,path,data):
+        if path=='/api/study/score':
+            from study import validate,metrics
+            self.admin(u);sid=data.get('session')
+            with self.lock,self.db:
+                self.access(u,sid);s=self.read(sid)
+                require(not s['running'],'Pause or close the simulation before scoring')
+                try:score=validate(data,len(s['items']))
+                except ValueError as e:raise Problem(str(e))
+                score.update(timestamp=stamp(),reviewer=u['id'],state_version=s['version'],mode=s['mode'],task_seconds=s['elapsed'],workload=s['workload'],metrics=metrics(score['items']),evidence='observer-entered, not independently certified')
+                self.db.execute('INSERT INTO study_scores(session,body) VALUES (?,?)',(sid,json.dumps(score)))
+                self.event(sid,'STUDY_SCORE',None,score)
+            return self.session(u,sid)
         if path=='/api/session/create':return self.create_study(u,data)
         if path=='/api/session/action':return self.action(u,data)
         if path=='/api/review':

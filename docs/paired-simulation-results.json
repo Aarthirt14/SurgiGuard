@@ -1,0 +1,58 @@
+{
+  "trial_group": "AUTOMATED-PAIR-01",
+  "assisted": {
+    "mode": "assisted",
+    "confirmed": 5,
+    "active_seconds": 0,
+    "workload_0_to_10": null,
+    "responses": 6,
+    "flags": 2,
+    "recoveries": 1,
+    "observer_metrics": {
+      "items": 6,
+      "completion_accuracy": 1.0,
+      "omission_recall": 1.0,
+      "omission_opportunities": 1,
+      "false_prompt_rate": 0.0,
+      "nonprompt_opportunities": 4,
+      "interruption_recovery": 1.0,
+      "interruption_opportunities": 1,
+      "latency_samples": 0,
+      "median_latency_ms": null,
+      "p95_latency_ms": null
+    },
+    "score_state_version": 15,
+    "score_matches_current_state": true,
+    "score_task_seconds": 0,
+    "score_workload": null
+  },
+  "static": {
+    "mode": "static",
+    "confirmed": 5,
+    "active_seconds": 0,
+    "workload_0_to_10": null,
+    "responses": 0,
+    "flags": 0,
+    "recoveries": 0,
+    "observer_metrics": {
+      "items": 6,
+      "completion_accuracy": 1.0,
+      "omission_recall": 0.0,
+      "omission_opportunities": 1,
+      "false_prompt_rate": 0.0,
+      "nonprompt_opportunities": 4,
+      "interruption_recovery": 1.0,
+      "interruption_opportunities": 1,
+      "latency_samples": 0,
+      "median_latency_ms": null,
+      "p95_latency_ms": null
+    },
+    "score_state_version": 7,
+    "score_matches_current_state": true,
+    "score_task_seconds": 0,
+    "score_workload": null
+  },
+  "limitation": "Descriptive comparison of recorded observations. Observer labels are not externally certified. Control order, participants and timing method; no clinical benefit inferred.",
+  "scope": "Automated state-machine exercise only. Not a controlled human study or evidence of clinical efficacy.",
+  "timing_note": "Active seconds are machine execution time, not participant task time. Omission deadline advanced by test harness."
+}

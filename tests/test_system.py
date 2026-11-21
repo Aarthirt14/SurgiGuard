@@ -50,6 +50,18 @@ class SystemTests(unittest.TestCase):
   self.store.db.execute('DELETE FROM logins WHERE token=?',(digest(self.token),));self.store.db.commit()
   with self.assertRaises(Problem):self.store.user(self.token)
 
+ def test_study_scores_require_coordinator_and_preserve_versions(self):
+  from study import FIELDS
+  self.approve();sid=self.create()['state']['id']
+  data=dict(session=sid,participant='TEST-ONLY',method='Independent synthetic fixture labels',items=[{**{k:False for k in FIELDS},'latency_ms':None} for _ in range(6)])
+  with self.assertRaises(Problem):self.store.mutate(self.members['Nurse'],'/api/study/score',data)
+  first=self.store.mutate(self.admin,'/api/study/score',data)
+  self.assertEqual(len(first['scores']),1);self.assertIsNone(first['scores'][0]['metrics']['omission_recall'])
+  self.act(self.admin,sid,'toggle')
+  with self.assertRaises(Problem):self.store.mutate(self.admin,'/api/study/score',data)
+  self.act(self.admin,sid,'toggle');second=self.store.mutate(self.admin,'/api/study/score',data)
+  self.assertEqual(len(second['scores']),2);self.assertLess(second['scores'][0]['state_version'],second['scores'][1]['state_version'])
+
 class SystemHTTPTests(unittest.TestCase):
  def test_http_roundtrip_and_no_legacy_bypass(self):
   with tempfile.TemporaryDirectory() as tmp:

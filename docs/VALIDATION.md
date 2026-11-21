@@ -35,3 +35,7 @@ Require institutional clinical leadership, ethics/privacy review as applicable, 
 | Clinical benefit/safety | No evidence claimed | Approved prospective clinical evaluation |
 
 Passing a software test or obtaining a good demo recording does not establish clinical reliability.
+
+## Implementation update
+
+Automatic active-time omission deadlines, explicit observer scoring and separate-microphone overlap monitoring are now available. Experimental duplex recognition observes playback-contaminated turns but rejects them. `scripts/run_paired_simulation.py` exercises both modes with scripted actors and publishes a clearly labeled machine-only report. `scripts/build_audio_corpus.py` creates controlled TTS/noise/overlap WAVs. The first corpus run did not pass enrollment; keep this failure in the evidence register. Neither automation is a substitute for the controlled participant study described above.

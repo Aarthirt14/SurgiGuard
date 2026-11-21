@@ -18,8 +18,16 @@ def assess(item, text, role, confidence, kind):
     if kind == 'omission': return 'flag', f'No response recorded. Ask the {item["role"]} to respond.'
     if confidence is None or confidence < .85: return 'flag', 'Recognition is uncertain. Please repeat; nothing has been confirmed.'
     if role != item['role']: return 'flag', f'Role mismatch. Please ask the designated {item["role"]}.'
-    if re.search(r"\b(not|no|never|uncertain|unconfirmed|wrong|right|isn.t|wasn.t|haven.t|hasn.t|don.t|didn.t)\b", text, re.I):
+    if re.search(r"\b(not|no|never|uncertain|unconfirmed|unsure|maybe|missing|unverified|unavailable|except|pending|wrong|right|isn.t|wasn.t|haven.t|hasn.t|don.t|didn.t)\b", text, re.I):
         return 'flag', 'Negative or contradictory evidence. Resolve the discrepancy, then submit corrected evidence.'
     if not any(re.search(p, text, re.I) for p in item['patterns']):
         return 'flag', 'Evidence does not match this bounded protocol item. Please clarify using the displayed expected response.'
     return 'pending', f'Evidence captured. The designated {item["role"]} must explicitly confirm.'
+
+
+# Reference metadata is guidance provenance, never institutional approval.
+for item in ITEMS:
+    item['reference'] = dict(title='WHO Surgical Safety Checklist (2009)',
+        url='https://www.who.int/docs/default-source/patient-safety/9789241598590-eng-checklist.pdf',
+        section='Before skin incision',adaptation='Simplified nonclinical teaching item; not a complete WHO checklist',
+        institutional_approval=False)

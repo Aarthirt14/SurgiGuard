@@ -21,6 +21,16 @@ Screenshots from the running **v0.3 research prototype**, populated with synthet
 | [![Named team accounts with designated roles and responsibilities](docs/screenshots/05-team.jpg)](docs/screenshots/05-team.jpg) | [![Versioned protocols showing simulation-reviewed and draft states](docs/screenshots/06-protocols.jpg)](docs/screenshots/06-protocols.jpg) |
 | Coordinator, surgeon, anaesthetist and nurse responsibilities. | Versioned sources, review status and draft revisions. |
 
+### Trial scoring
+
+[![Trial scoring with a clearly labeled synthetic UI-test record](docs/screenshots/07-trial-scoring.jpg)](docs/screenshots/07-trial-scoring.jpg)
+
+The displayed score is a UI test fixture, not a participant-study result.
+
+## Requirement coverage and evidence
+
+The prototype now includes automatic response deadlines, experimental duplex recognition, overlap monitoring across separate clinician microphones, and a **Trial scoring** workflow covering all seven PS measures. See [requirement-by-requirement status](docs/REQUIREMENTS.md) for implementation, tests and remaining acceptance gates. Actual acoustic bench failures are published; this is not a claim of complete PS acceptance or clinical reliability.
+
 ## Run locally
 
 Python 3.10+. No pip/npm dependencies or paid AI API keys are required for the core.

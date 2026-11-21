@@ -1,7 +1,7 @@
 /* Local continuous PCM transport; transcript/role decisions stay on the server. */
 class LocalAudio {
   constructor(onEvent){this.onEvent=onEvent;this.closed=false;this.seq=0;this.playing=false;this.loud=0;}
-  async start(token,session,item){
+  async start(token,session,item,duplex=false){
     try{
       this.media=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
       if(this.closed){this.media.getTracks().forEach(t=>t.stop());return;}
@@ -10,7 +10,7 @@ class LocalAudio {
       if(this.closed){await this.ctx.close();return;}
       const scheme=location.protocol==='https:'?'wss:':'ws:';
       this.ws=new WebSocket(scheme+'//'+location.host+'/api/audio/stream');
-      this.ws.onopen=()=>this.ws.send(JSON.stringify({token,session,item}));
+      this.ws.onopen=()=>this.ws.send(JSON.stringify({token,session,item,duplex}));
       this.ws.onmessage=async e=>{
         if(this.closed)return;
         const data=JSON.parse(e.data);

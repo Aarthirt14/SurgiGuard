@@ -40,11 +40,16 @@ def main():
     manifest=Path(args.manifest);data=json.loads(manifest.read_text());speakers=Speakers()
     if data.get('synthetic_only') is not True:raise ValueError('Only consented recordings of synthetic scenarios are supported')
     if len(data['enrollment'])!=3:raise ValueError('Provide exactly three enrollment recordings')
+    enrollment=[]
     for name in data['enrollment']:
         results,clip,_,_=recognize(manifest.parent/name,factory)
-        if len(results)!=1 or clip>.02 or (word_confidence(results[0]) or 0)<.85:
-            raise ValueError('Each enrollment file must contain one clear, confidently transcribed utterance')
-        speakers.enroll(results[0].get('spk'),results[0].get('spk_frames',0))
+        try:
+            if len(results)!=1 or clip>.02 or (word_confidence(results[0]) or 0)<.85:
+                raise ValueError('One clear, confidently transcribed utterance required')
+            speakers.enroll(results[0].get('spk'),results[0].get('spk_frames',0))
+            enrollment.append(dict(file=name,accepted=True))
+        except ValueError as e:enrollment.append(dict(file=name,accepted=False,reason=str(e)))
+    enrolled=speakers.reference is not None
     rows=[];errors=words=0
     for case in data['trials']:
         if type(case.get('expected_speaker')) is not bool or type(case.get('overlap')) is not bool:raise ValueError('Independent speaker and overlap labels required')
@@ -60,8 +65,8 @@ def main():
     target=[r for r in rows if r['expected_speaker'] and not r['overlap']]
     report=dict(nonclinical=True,engine='vosk',clinical_validation=False,
         note='Offline processing timing is not live response latency. Acceptance is an audio gate, never checklist completion.',
-        word_error_rate=errors/words if words else None,trials=len(rows),
-        false_accept_rate=sum(r['accepted'] for r in non_target)/len(non_target) if non_target else None,
-        target_accept_rate=sum(r['accepted'] for r in target)/len(target) if target else None,results=rows)
+        word_error_rate=errors/words if words else None,trials=len(rows),enrollment=enrollment,speaker_metrics_valid=enrolled,corpus_provenance=data.get('provenance','user-supplied recordings'),
+        false_accept_rate=sum(r['accepted'] for r in non_target)/len(non_target) if non_target and enrolled else None,
+        target_accept_rate=sum(r['accepted'] for r in target)/len(target) if target and enrolled else None,results=rows)
     Path(args.output).write_text(json.dumps(report,indent=2));print(args.output)
 if __name__=='__main__':main()
