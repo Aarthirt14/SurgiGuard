@@ -34,10 +34,12 @@ class Speakers:
         self.threshold, self.margin = threshold, margin
 
     def enroll(self, vector, frames):
-        if frames < 100:
+        if self.reference is not None:
+            raise ValueError('Enrollment already complete')
+        if type(frames) not in (int, float) or not math.isfinite(frames) or frames < 100:
             raise ValueError('Speak for longer: at least 100 speaker frames required')
         v = unit(vector)
-        if self.samples and similarity(self.samples[0], v) < self.threshold:
+        if any(similarity(sample, v) < self.threshold for sample in self.samples):
             raise ValueError('Enrollment voices differ; reconnect and enroll one speaker')
         self.samples.append(v)
         if len(self.samples) == 3:

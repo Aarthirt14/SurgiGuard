@@ -29,7 +29,7 @@ The displayed score is a UI test fixture, not a participant-study result.
 
 ## Requirement coverage and evidence
 
-The prototype now includes automatic response deadlines, experimental duplex recognition, overlap monitoring across separate clinician microphones, and a **Trial scoring** workflow covering all seven PS measures. See [requirement-by-requirement status](docs/REQUIREMENTS.md) for implementation, tests and remaining acceptance gates. Actual acoustic bench failures are published; this is not a claim of complete PS acceptance or clinical reliability.
+The prototype now includes automatic response deadlines, experimental duplex recognition, overlap monitoring across separate clinician microphones, and a **Trial scoring** workflow covering all seven PS measures. See [requirement-by-requirement status](docs/REQUIREMENTS.md) for implementation, tests and remaining acceptance gates. The [voice enrollment repair and retest](docs/AUDIO-FOLLOWUP.md) passes enrollment while preserving the original acoustic failures; this is not a claim of complete PS acceptance or clinical reliability.
 
 ## Run locally
 

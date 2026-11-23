@@ -5,7 +5,7 @@ This record separates delivered software from external approval and performance 
 | PS deliverable | Delivered implementation | Evidence / remaining acceptance |
 | --- | --- | --- |
 | 1. Approved KB, synthetic cases, omissions and noise scenarios | Frozen reviewed protocol snapshots; source references; synthetic case library; scripted disruptions; reproducible 26-recording noise/overlap corpus | Local simulation-review approval is supported. Institutional clinician approval is not supplied by code. Corpus is generated TTS, not OR recordings. |
-| 2. Streaming ASR and speaker/turn handling | Local Vosk, AudioWorklet PCM, enrollment gates, anonymous other-speaker labels; simultaneous activity monitoring across assigned microphones | Transport and gate tests pass. Held-out acoustic reliability is not established; current synthetic enrollment run failed. |
+| 2. Streaming ASR and speaker/turn handling | Local Vosk, AudioWorklet PCM, enrollment gates, anonymous other-speaker labels; simultaneous activity monitoring across assigned microphones | Transport and gate tests pass. Held-out acoustic reliability is not established; original synthetic enrollment failed; the repaired path enrolls all three samples, but speech acceptance remains inadequate. See AUDIO-FOLLOWUP.md. |
 | 3. Grounded dialogue, state, confidence and abstention | Fixed role/source/evidence graph; conservative matching; uncertainty/contradiction gates; server-side response deadlines; experimental duplex recognition with contamination rejection | Rule tests and timeout tests pass. General language understanding, mixed-room source separation and reliable echo cancellation are not claimed. |
 | 4. Confirmation, correction, override, audit | Role-bound explicit confirmation, append-only events, interruption context, corrections, exports and scored-study provenance | Account/closure/version tests pass. Admin rewriting of SQLite remains possible. |
 | 5. Nonclinical interface | Routed workspace with synthetic-only labels, protocol review, sessions, audio selection and Trial scoring | Browser smoke test submitted a clearly labeled synthetic UI score. |
@@ -27,10 +27,10 @@ node tests/test_audio_client.cjs
 python scripts/run_paired_simulation.py
 # Requires FFmpeg compiled with libflite and the downloaded Vosk models:
 python scripts/build_audio_corpus.py
-python scripts/evaluate_audio.py data/audio-corpus/study.json --model models/vosk-model-small-en-us-0.15 --speaker-model models/vosk-model-spk-0.4 --output docs/acoustic-bench-results.json
+python scripts/evaluate_audio.py data/audio-corpus/study.json --model models/vosk-model-small-en-us-0.15 --speaker-model models/vosk-model-spk-0.4 --output audio-report-retest.json
 ```
 
-See [automated paired results](paired-simulation-results.json) and [actual acoustic model results](acoustic-bench-results.json). The former uses scripted actors, not people. The latter includes poor/noisy transcription and failed enrollment. WER can exceed 100% when insertions exceed the reference length. Speaker acceptance rates are null when enrollment fails. No thresholds were relaxed to manufacture passing results.
+See [automated paired results](paired-simulation-results.json) and [actual acoustic model results](acoustic-bench-results.json). The former uses scripted actors, not people. The latter includes poor/noisy transcription and failed enrollment. WER can exceed 100% when insertions exceed the reference length. Speaker acceptance rates are null when enrollment fails. The [enrollment repair and retest](AUDIO-FOLLOWUP.md) retains that failure and distinguishes voice-reference quality from checklist transcription confidence. Evidence acceptance thresholds are unchanged.
 
 ## Remaining acceptance gates
 

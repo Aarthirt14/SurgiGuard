@@ -3,7 +3,7 @@
 Usage: python scripts/evaluate_audio.py study.json --model models/... --speaker-model models/...
 No audio or embeddings are included in the output. Ground truth never drives inference.
 """
-import argparse,json,sys,time,wave
+import argparse,hashlib,json,sys,time,wave
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from audio.gates import Speakers,word_confidence,pcm_quality
@@ -44,10 +44,10 @@ def main():
     for name in data['enrollment']:
         results,clip,_,_=recognize(manifest.parent/name,factory)
         try:
-            if len(results)!=1 or clip>.02 or (word_confidence(results[0]) or 0)<.85:
-                raise ValueError('One clear, confidently transcribed utterance required')
+            if len(results)!=1 or clip>.02:
+                raise ValueError('One unclipped speech utterance required')
             speakers.enroll(results[0].get('spk'),results[0].get('spk_frames',0))
-            enrollment.append(dict(file=name,accepted=True))
+            enrollment.append(dict(file=name,accepted=True,minimum_word_confidence=word_confidence(results[0]),speaker_frames=results[0].get('spk_frames',0)))
         except ValueError as e:enrollment.append(dict(file=name,accepted=False,reason=str(e)))
     enrolled=speakers.reference is not None
     rows=[];errors=words=0
@@ -60,10 +60,15 @@ def main():
         accepted=bool(results) and clip<=.02 and all(m['accepted'] and (word_confidence(r) or 0)>=.85 for r,m in zip(results,matches))
         rows.append(dict(id=case['id'],condition=case['condition'],expected_speaker=case['expected_speaker'],overlap=case['overlap'],
             accepted=accepted,word_errors=err,reference_words=n,processing_seconds=processing,audio_seconds=duration,
+            minimum_word_confidences=[word_confidence(r) for r in results],
+            sha256=hashlib.sha256((manifest.parent/case['file']).read_bytes()).hexdigest(),
             real_time_factor=processing/duration if duration else None,speaker_labels=[m['label'] for m in matches]))
     non_target=[r for r in rows if not r['expected_speaker'] or r['overlap']]
     target=[r for r in rows if r['expected_speaker'] and not r['overlap']]
     report=dict(nonclinical=True,engine='vosk',clinical_validation=False,
+        model=Path(args.model).name,speaker_model=Path(args.speaker_model).name,
+        enrollment_sha256={name:hashlib.sha256((manifest.parent/name).read_bytes()).hexdigest() for name in data['enrollment']},
+        thresholds=dict(minimum_word_confidence=.85,speaker_similarity=.75,speaker_margin=.10,maximum_clipping=.02),
         note='Offline processing timing is not live response latency. Acceptance is an audio gate, never checklist completion.',
         word_error_rate=errors/words if words else None,trials=len(rows),enrollment=enrollment,speaker_metrics_valid=enrolled,corpus_provenance=data.get('provenance','user-supplied recordings'),
         false_accept_rate=sum(r['accepted'] for r in non_target)/len(non_target) if non_target and enrolled else None,

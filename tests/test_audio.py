@@ -45,7 +45,26 @@ class AudioTests(unittest.TestCase):
         s=Stream(Recognizer(),lambda *a:None)
         with self.assertRaises(ValueError):s.feed(packet(1))
         self.assertEqual(s.feed(packet(0,32767))['type'],'rejected')
+        s.enrolling=False
         s.rec.value=result(conf=.4);self.assertEqual(s.feed(packet(1))['type'],'rejected')
+    def test_enrollment_does_not_require_correct_words_but_evidence_does(self):
+        emitted=[];r=Recognizer();r.value=result(conf=.2)
+        s=Stream(r,lambda *args:emitted.append(args))
+        for i in range(3):self.assertEqual(s.feed(packet(i))['type'],'enrollment')
+        self.assertFalse(s.enrolling)
+        self.assertEqual(s.feed(packet(3))['type'],'rejected')
+        self.assertEqual(emitted,[])
+        r.value=result(conf=.98)
+        self.assertEqual(s.feed(packet(4))['type'],'evidence')
+        self.assertEqual(len(emitted),1)
+    def test_every_enrollment_sample_must_match_and_completion_is_bounded(self):
+        s=Speakers();s.enroll([1,0],150);s.enroll([.8,.6],150)
+        with self.assertRaises(ValueError):s.enroll([.8,-.6],150)
+        self.assertEqual(len(s.samples),2)
+        s.enroll([1,0],150)
+        with self.assertRaises(ValueError):s.enroll([1,0],150)
+        for frames in [float('nan'),float('inf'),None,True]:
+            with self.assertRaises(ValueError):Speakers().enroll([1,0],frames)
     def test_playback_and_cooldown_never_transcribe(self):
         clock=[0];r=Recognizer();s=Stream(r,lambda *a:None,clock=lambda:clock[0])
         s.playback(True);s.feed(packet(0));self.assertEqual(r.calls,0)

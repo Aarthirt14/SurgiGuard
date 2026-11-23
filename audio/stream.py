@@ -68,8 +68,8 @@ class Stream:
         if echo or overlap:
             return {'type':'rejected','text':text,'reason':'Simultaneous channels or assistant playback contaminated this turn; repeat one speaker at a time','overlap':overlap,'echo':echo}
         confidence = word_confidence(result)
-        if clipping > .02 or confidence is None or confidence < .85:
-            return {'type': 'rejected', 'text': text, 'reason': 'Clipping or uncertain transcription; repeat', 'confidence': confidence}
+        if clipping > .02:
+            return {'type': 'rejected', 'text': text, 'reason': 'Audio clipping; reduce microphone gain and repeat', 'confidence': confidence}
         if self.enrolling:
             try:
                 count = self.speakers.enroll(result.get('spk'), result.get('spk_frames', 0))
@@ -77,6 +77,8 @@ class Stream:
                 return {'type': 'rejected', 'reason': str(exc)}
             self.enrolling = count < 3
             return {'type': 'enrollment', 'count': count, 'ready': not self.enrolling}
+        if confidence is None or confidence < .85:
+            return {'type': 'rejected', 'text': text, 'reason': 'Uncertain transcription; repeat', 'confidence': confidence}
         speaker = self.speakers.identify(result.get('spk'), result.get('spk_frames', 0))
         if not speaker['accepted']:
             return {'type': 'rejected', 'text': text, 'speaker': speaker, 'reason': 'Different, short or ambiguous voice; nothing accepted'}

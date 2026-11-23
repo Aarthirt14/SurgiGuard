@@ -1,0 +1,543 @@
+{
+  "nonclinical": true,
+  "engine": "vosk",
+  "clinical_validation": false,
+  "note": "Offline processing timing is not live response latency. Acceptance is an audio gate, never checklist completion.",
+  "word_error_rate": 1.0946745562130178,
+  "trials": 26,
+  "enrollment": [
+    {
+      "file": "enroll-1.wav",
+      "accepted": true,
+      "minimum_word_confidence": 0.21401,
+      "speaker_frames": 384
+    },
+    {
+      "file": "enroll-2.wav",
+      "accepted": true,
+      "minimum_word_confidence": 0.388222,
+      "speaker_frames": 468
+    },
+    {
+      "file": "enroll-3.wav",
+      "accepted": true,
+      "minimum_word_confidence": 0.292366,
+      "speaker_frames": 444
+    }
+  ],
+  "speaker_metrics_valid": true,
+  "corpus_provenance": "FFmpeg libflite synthetic voices kal/slt; deterministic Gaussian noise seed 42; not humans or OR acoustics",
+  "false_accept_rate": 0.0,
+  "target_accept_rate": 0.0,
+  "results": [
+    {
+      "id": "team-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 8,
+      "processing_seconds": 1.169996311000034,
+      "audio_seconds": 3.68575,
+      "minimum_word_confidences": [
+        0.342866
+      ],
+      "sha256": "6aabd36fcf1c26e63e984c40d6407679e385bb8f0eba068922c127fd49a9cac9",
+      "real_time_factor": 0.3174377836261369,
+      "speaker_labels": [
+        "enrolled-speaker"
+      ]
+    },
+    {
+      "id": "team-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 8,
+      "processing_seconds": 1.109859484000026,
+      "audio_seconds": 3.68575,
+      "minimum_word_confidences": [
+        0.284797
+      ],
+      "sha256": "ba7e2754be6c05086f1d2cdf52253d9ea1014bbc19685e48514d056a3464ded9",
+      "real_time_factor": 0.30112174835515865,
+      "speaker_labels": [
+        "other-speaker-1"
+      ]
+    },
+    {
+      "id": "team-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 8,
+      "processing_seconds": 0.8222422599999959,
+      "audio_seconds": 3.68575,
+      "minimum_word_confidences": [],
+      "sha256": "097b46b9d0e80a9acf3fa30731876df90663f6f6d979986aab8ef609db6bb13a",
+      "real_time_factor": 0.2230868235772898,
+      "speaker_labels": []
+    },
+    {
+      "id": "team-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 9,
+      "reference_words": 8,
+      "processing_seconds": 1.1943788140000038,
+      "audio_seconds": 3.68575,
+      "minimum_word_confidences": [
+        0.458692
+      ],
+      "sha256": "abac3ffb4c685315aecd2e491ef51ca0c687d6b8a7e66e662ccc594232006f93",
+      "real_time_factor": 0.32405312731465885,
+      "speaker_labels": [
+        "other-speaker-2"
+      ]
+    },
+    {
+      "id": "identity-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 9,
+      "reference_words": 8,
+      "processing_seconds": 1.122435734000021,
+      "audio_seconds": 5.468125,
+      "minimum_word_confidences": [
+        0.292259
+      ],
+      "sha256": "e8f23a38f41d5761b84f3490a6a88d0e56761bb1d45ab3f42e53cd678a43fe10",
+      "real_time_factor": 0.20526885065722184,
+      "speaker_labels": [
+        "enrolled-speaker"
+      ]
+    },
+    {
+      "id": "identity-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 13,
+      "reference_words": 8,
+      "processing_seconds": 1.8367254329999696,
+      "audio_seconds": 5.468125,
+      "minimum_word_confidences": [
+        0.266907,
+        0.760931
+      ],
+      "sha256": "971e686aa4308cb868ffb5ef5a553607da65f7c8e725a9867f7a8293540d6dae",
+      "real_time_factor": 0.33589675309177636,
+      "speaker_labels": [
+        "other-speaker-3",
+        "unknown"
+      ]
+    },
+    {
+      "id": "identity-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 8,
+      "processing_seconds": 1.7617677509999794,
+      "audio_seconds": 5.468125,
+      "minimum_word_confidences": [
+        0.250376,
+        0.262854
+      ],
+      "sha256": "c1920f1fca4036191d4dc0fab82c8994d0a2ffdd2ccc56b72ec075333364c318",
+      "real_time_factor": 0.3221886388844402,
+      "speaker_labels": [
+        "other-speaker-4",
+        "unknown"
+      ]
+    },
+    {
+      "id": "identity-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 15,
+      "reference_words": 8,
+      "processing_seconds": 1.5412883530000272,
+      "audio_seconds": 5.468125,
+      "minimum_word_confidences": [
+        0.25254
+      ],
+      "sha256": "cf2f757e7db294cde33a0950478b53299c10c7666b269fc28c5b29d10f26643e",
+      "real_time_factor": 0.28186779801120626,
+      "speaker_labels": [
+        "other-speaker-2"
+      ]
+    },
+    {
+      "id": "surgeon-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 3,
+      "reference_words": 6,
+      "processing_seconds": 0.8904404049999926,
+      "audio_seconds": 3.133125,
+      "minimum_word_confidences": [
+        0.349067
+      ],
+      "sha256": "55fdea5b06cf12554d897a6839b9252d7429c901f9167ec2327c7caa9ae1509a",
+      "real_time_factor": 0.2842020043885873,
+      "speaker_labels": [
+        "enrolled-speaker"
+      ]
+    },
+    {
+      "id": "surgeon-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 6,
+      "reference_words": 6,
+      "processing_seconds": 1.1536835900000142,
+      "audio_seconds": 3.133125,
+      "minimum_word_confidences": [
+        0.375123
+      ],
+      "sha256": "254fe29e96011b11bb350c9300addeaf9662d8d3e5fa3bae1c1ec677582e3824",
+      "real_time_factor": 0.3682213732296075,
+      "speaker_labels": [
+        "other-speaker-5"
+      ]
+    },
+    {
+      "id": "surgeon-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 5,
+      "reference_words": 6,
+      "processing_seconds": 0.9747854959999813,
+      "audio_seconds": 3.133125,
+      "minimum_word_confidences": [
+        0.305174
+      ],
+      "sha256": "254090a178f9ceecb3c3053d5cf406d2d69659736ff5f4075c2865a7e2ced7a6",
+      "real_time_factor": 0.31112244037501896,
+      "speaker_labels": [
+        "other-speaker-6"
+      ]
+    },
+    {
+      "id": "surgeon-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 1.1137799030000224,
+      "audio_seconds": 3.133125,
+      "minimum_word_confidences": [
+        0.400393
+      ],
+      "sha256": "e06eaddc3f24f2f7b4f39bf91602f22c84f3d740123c4324d186edbf2771b501",
+      "real_time_factor": 0.35548530716138754,
+      "speaker_labels": [
+        "other-speaker-7"
+      ]
+    },
+    {
+      "id": "anaesthesia-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 1.0305498689999695,
+      "audio_seconds": 3.436875,
+      "minimum_word_confidences": [
+        0.338806
+      ],
+      "sha256": "d99c15f1cc5b3dfe780c56825798ee640d8e7158a2d637c59f2285c48bbdcb1c",
+      "real_time_factor": 0.29985084386251154,
+      "speaker_labels": [
+        "enrolled-speaker"
+      ]
+    },
+    {
+      "id": "anaesthesia-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 1.4620482550000133,
+      "audio_seconds": 3.436875,
+      "minimum_word_confidences": [
+        0.409101
+      ],
+      "sha256": "f2b61966fb69fa93b4cc689768c0f03a871b4d1805990c36a42b40c4845dc8cc",
+      "real_time_factor": 0.4254004742680526,
+      "speaker_labels": [
+        "other-speaker-5"
+      ]
+    },
+    {
+      "id": "anaesthesia-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 5,
+      "reference_words": 6,
+      "processing_seconds": 1.0651526739999895,
+      "audio_seconds": 3.436875,
+      "minimum_word_confidences": [
+        0.556952,
+        0.282225
+      ],
+      "sha256": "224c4395a081e3e5b5c5850f8a4f2990fcecb2e10a5d7fef8bf519191c27412f",
+      "real_time_factor": 0.30991894497181,
+      "speaker_labels": [
+        "unknown",
+        "unknown"
+      ]
+    },
+    {
+      "id": "anaesthesia-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 6,
+      "processing_seconds": 0.9840409689999774,
+      "audio_seconds": 3.436875,
+      "minimum_word_confidences": [
+        0.23546
+      ],
+      "sha256": "42c99889d82c825f28cadf3fe205d8d34167d8dda4b5fbd50a7c2151fabc7579",
+      "real_time_factor": 0.2863185216221065,
+      "speaker_labels": [
+        "other-speaker-8"
+      ]
+    },
+    {
+      "id": "sterility-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 6,
+      "reference_words": 5,
+      "processing_seconds": 1.0263020219999817,
+      "audio_seconds": 3.798,
+      "minimum_word_confidences": [
+        0.52667
+      ],
+      "sha256": "01bd92438a0f3e64a6e05a69b07116e25c6aad4b7c1a4025d9807903a2caf736",
+      "real_time_factor": 0.27022170142179613,
+      "speaker_labels": [
+        "enrolled-speaker"
+      ]
+    },
+    {
+      "id": "sterility-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 5,
+      "processing_seconds": 1.2590693880000003,
+      "audio_seconds": 3.798,
+      "minimum_word_confidences": [
+        0.265787
+      ],
+      "sha256": "6bd7680deabdf40aea089896827827797136d17e5b0241406934589be59aa298",
+      "real_time_factor": 0.33150852764612965,
+      "speaker_labels": [
+        "other-speaker-3"
+      ]
+    },
+    {
+      "id": "sterility-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 5,
+      "reference_words": 5,
+      "processing_seconds": 0.9348652219999849,
+      "audio_seconds": 3.798,
+      "minimum_word_confidences": [
+        0.906473,
+        1.0
+      ],
+      "sha256": "9a93102a89f6317f45f2f71b14945a76a10c0f0f59c1a103c19a373e92671bb1",
+      "real_time_factor": 0.24614671458662055,
+      "speaker_labels": [
+        "unknown",
+        "unknown"
+      ]
+    },
+    {
+      "id": "sterility-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 8,
+      "reference_words": 5,
+      "processing_seconds": 0.9860373390000063,
+      "audio_seconds": 3.798,
+      "minimum_word_confidences": [
+        0.651613
+      ],
+      "sha256": "34077d26d00a91ac7a5485aa74643ad7100e8b3566909fdea5b84d9da01bcdb1",
+      "real_time_factor": 0.2596201524486589,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "review-clean",
+      "condition": "clean",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 1.4610402760000056,
+      "audio_seconds": 4.2185,
+      "minimum_word_confidences": [
+        0.330996
+      ],
+      "sha256": "e79e786533801572c943819dd22e62c3b58a5d57931fcd7505002b109984fe43",
+      "real_time_factor": 0.3463411819367087,
+      "speaker_labels": [
+        "enrolled-speaker"
+      ]
+    },
+    {
+      "id": "review-noise10",
+      "condition": "noise10",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 10,
+      "reference_words": 6,
+      "processing_seconds": 1.268287627999996,
+      "audio_seconds": 4.2185,
+      "minimum_word_confidences": [
+        0.376171
+      ],
+      "sha256": "1bf19430a60f955765cab4134fe598b0ca7047270a38a8c3ac1d738efec55008",
+      "real_time_factor": 0.3006489576863805,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "review-noise0",
+      "condition": "noise0",
+      "expected_speaker": true,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 6,
+      "reference_words": 6,
+      "processing_seconds": 1.0585086359999991,
+      "audio_seconds": 4.2185,
+      "minimum_word_confidences": [
+        0.366939,
+        0.393027
+      ],
+      "sha256": "a353dd710080a8222b1fefb083ccaac74b55058e1966d2b3a564ed1e476714c4",
+      "real_time_factor": 0.2509206201256369,
+      "speaker_labels": [
+        "unknown",
+        "unknown"
+      ]
+    },
+    {
+      "id": "review-overlap",
+      "condition": "overlap",
+      "expected_speaker": true,
+      "overlap": true,
+      "accepted": false,
+      "word_errors": 7,
+      "reference_words": 6,
+      "processing_seconds": 1.1989467820000073,
+      "audio_seconds": 4.2185,
+      "minimum_word_confidences": [
+        0.288413
+      ],
+      "sha256": "a24b4a5a5ef8a61e5128b824bc2434121351a2778fa17d620b489a52f63f7f00",
+      "real_time_factor": 0.2842116349413316,
+      "speaker_labels": [
+        "other-speaker-2"
+      ]
+    },
+    {
+      "id": "wrong-speaker",
+      "condition": "different speaker",
+      "expected_speaker": false,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 2,
+      "reference_words": 13,
+      "processing_seconds": 0.8209251469999685,
+      "audio_seconds": 5.61,
+      "minimum_word_confidences": [
+        1.0
+      ],
+      "sha256": "8491e00d285d81b90bfc87133fff1114156c3c9d1a7c2c5ccc9f515daf483811",
+      "real_time_factor": 0.14633246827093913,
+      "speaker_labels": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "silence",
+      "condition": "silence",
+      "expected_speaker": false,
+      "overlap": false,
+      "accepted": false,
+      "word_errors": 0,
+      "reference_words": 0,
+      "processing_seconds": 0.34695391300004985,
+      "audio_seconds": 6.0,
+      "minimum_word_confidences": [],
+      "sha256": "47b589098cc9e4b92774cd5b6a57ccca0713c02396bf755b2318f7e81cdc534e",
+      "real_time_factor": 0.05782565216667498,
+      "speaker_labels": []
+    }
+  ],
+  "model": "vosk-model-small-en-us-0.15",
+  "speaker_model": "vosk-model-spk-0.4",
+  "thresholds": {
+    "minimum_word_confidence": 0.85,
+    "speaker_similarity": 0.75,
+    "speaker_margin": 0.1,
+    "maximum_clipping": 0.02
+  },
+  "enrollment_sha256": {
+    "enroll-1.wav": "b778ab2163705afdf66e1c7819dda4159b81b8c0a8b810f33b45e599a278d963",
+    "enroll-2.wav": "253ff0fee15848b17e7ba6f42666cd67512669c197c899fc1bffcdef667671e5",
+    "enroll-3.wav": "d48b982a0b186985774bd9001e346944d461a8a3ae33cc6bb366ed52c1322e9c"
+  }
+}
